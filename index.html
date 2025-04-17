@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyber Quest CTF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body { font-family: monospace; background: #1a1a1a; color: #0f0; }
+        .level { display: none; margin: 10% auto; width: 70%; text-align: center; }
+        input { padding: 10px; margin: 10px; background: #333; color: #0f0; }
+        img { max-width: 500px; border: 2px solid #0f0; }
+        #level1 { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- Level 1 -->
+    <div class="level" id="level1">
+        <h2>LEVEL 1: Hidden in Plain Sight</h2>
+        <img src="innocent-image.jpg" alt="Inspect me with EXIF tools">
+        <form onsubmit="checkPassword(event, 1)">
+            <input type="password" placeholder="FLAG{...}" required>
+            <input type="submit" value="Submit">
+        </form>
+        <p>Hint: Check what's hidden in the image's metadata</p>
+    </div>
+
+    <!-- Level 2 -->
+    <div class="level" id="level2">
+        <h2>LEVEL 2: Hash Cracking</h2>
+        <p>Find the MD5 hash in page source and crack it!</p>
+        <!-- Password hash: 5847d3e6e556d4645b2f7334eeb4d0c1 -->
+        <form onsubmit="checkPassword(event, 2)">
+            <input type="password" placeholder="FLAG{...}" required>
+            <input type="submit" value="Submit">
+        </form>
+        <p>Hint: MD5 of "S3cr3t_Layer2"</p>
+    </div>
+
+    <!-- Level 3 -->
+    <div class="level" id="level3">
+        <h2>LEVEL 3: XOR Cipher</h2>
+        <p>Decrypt this: U28zM3QgQ1RG</p>
+        <form onsubmit="checkPassword(event, 3)">
+            <input type="password" placeholder="FLAG{...}" required>
+            <input type="submit" value="Submit">
+        </form>
+        <p>Hint: Base64 decoded then XOR 0x0F</p>
+    </div>
+
+    <!-- Level 4 -->
+    <div class="level" id="level4">
+        <h2>LEVEL 4: JavaScript Obfuscation</h2>
+        <p><!-- var _0x3a2c=['\x50\x34\x73\x73\x77\x30\x72\x64\x46\x6c\x33\x78'] --></p>
+        <form onsubmit="checkPassword(event, 4)">
+            <input type="password" placeholder="FLAG{...}" required>
+            <input type="submit" value="Submit">
+        </form>
+        <p>Hint: Check hex encoded strings in comments</p>
+    </div>
+
+    <script>
+        function checkPassword(e, level) {
+            e.preventDefault();
+            const input = e.target.querySelector('input[type="password"]').value;
+            let valid = false;
+
+            switch(level) {
+                case 1:
+                    valid = input === 'P3nGu1n_Tr1b3';
+                    break;
+                case 2:
+                    valid = CryptoJS.MD5(input).toString() === '5847d3e6e556d4645b2f7334eeb4d0c1';
+                    break;
+                case 3:
+                    const decoded = atob('U28zM3QgQ1RG');
+                    valid = input === decoded.split('').map(c =>
+                        String.fromCharCode(c.charCodeAt(0) ^ 0x0F)).join('');
+                    break;
+                case 4:
+                    valid = input === String.fromCharCode(
+                        0x50,0x34,0x73,0x73,0x77,0x30,0x72,0x64,0x46,0x6c,0x33,0x78
+                    );
+                    break;
+            }
+
+            if(valid) {
+                document.getElementById(`level${level}`).style.display = 'none';
+                if(level < 4) {
+                    document.getElementById(`level${level+1}`).style.display = 'block';
+                } else {
+                    alert('CONGRATULATIONS! You completed all levels!');
+                }
+            } else {
+                alert('Wrong answer! Keep trying!');
+            }
+        }
+    </script>
+
+</body>
+</html>
